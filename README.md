@@ -1,5 +1,4 @@
 [![license](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/asahi417/lmppl/blob/master/LICENSE.txt)
-[![PyPI version](https://badge.fury.io/py/lmppl.svg)](https://badge.fury.io/py/lmppl)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/lmppl.svg)](https://pypi.python.org/pypi/lmppl/)
 [![PyPI status](https://img.shields.io/pypi/status/lmppl.svg)](https://pypi.python.org/pypi/lmppl/)
 
@@ -39,7 +38,7 @@ print(list(zip(text, ppl)))
   ('sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad.', 23.457012413190245)
 ]
 print(f"prediction: {text[ppl.index(min(ppl))]}")
->>> "prediction: I am sad."
+>>> "prediction: sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad."
 ```
 
 2. ***Masked LM*** including variants of BERT.
@@ -58,7 +57,7 @@ print(list(zip(text, ppl)))
   ('sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad.', 44.85423209906894)
 ]
 print(f"prediction: {text[ppl.index(min(ppl))]}")
->>> "prediction: I am sad."
+>>> "prediction: sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad."
 ```
 
 
