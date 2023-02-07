@@ -1,4 +1,5 @@
 [![license](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/asahi417/lmppl/blob/master/LICENSE.txt)
+[![PyPI version](https://badge.fury.io/py/lmppl.svg)](https://badge.fury.io/py/lmppl)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/lmppl.svg)](https://pypi.python.org/pypi/lmppl/)
 [![PyPI status](https://img.shields.io/pypi/status/lmppl.svg)](https://pypi.python.org/pypi/lmppl/)
 
