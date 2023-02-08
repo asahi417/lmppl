@@ -93,4 +93,4 @@ an optimal token length.
 - **Batch Size**: One can pass batch size to the function `get_perplexity` (eg. `get_perplexity(text, batch_size=32)`).
 As default, it will process all the text once, that may cause memory error if the number of texts is too large.
 
-- **DeBERTa**: DeBERTa models has a problem with their config files (the tokenizer's max token is incorrenct), so please specify the token length when use any DeBERTa models. Eg.) `mppl.MaskedLM('microsoft/deberta-v3-large', max_length=64)`.
+- **DeBERTa**: DeBERTa model has a problem with their config files (the tokenizer's max token is incorrenct), so please specify the token length when use any DeBERTa. Eg.) `lmppl.MaskedLM('microsoft/deberta-v3-large', max_length=512)`.
