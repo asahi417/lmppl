@@ -50,8 +50,11 @@ class MaskedLM:
             model, local_files_only=local_files_only, use_auth_token=use_auth_token)
         self.model = transformers.AutoModelForMaskedLM.from_pretrained(
             model, config=self.config, local_files_only=local_files_only, use_auth_token=use_auth_token)
-        self.max_length = max_length if max_length is not None else self.tokenizer.model_max_length
-        assert self.max_length <= self.tokenizer.model_max_length, f"{self.max_length} > {self.tokenizer.model_max_length}"
+        if max_length is None:
+            self.max_length = None
+        else:
+            self.max_length = max_length if max_length is not None else self.tokenizer.model_max_length
+            assert self.max_length <= self.tokenizer.model_max_length, f"{self.max_length} > {self.tokenizer.model_max_length}"
 
         # loss function
         self.loss_fct = torch.nn.CrossEntropyLoss(reduction='none')
@@ -105,15 +108,21 @@ class MaskedLM:
                 # convert into a sentence
                 _sentence = self.tokenizer.convert_tokens_to_string(_x)
                 # encode
-                _e = self.tokenizer(
-                    _sentence, max_length=self.max_length, truncation=True, padding='max_length', return_tensors='pt')
+                if self.max_length is not None:
+                    _e = self.tokenizer(
+                        _sentence, max_length=self.max_length, truncation=True, padding='max_length', return_tensors='pt')
+                else:
+                    _e = self.tokenizer(_sentence, truncation=True, padding=True, return_tensors='pt')
                 # add the correct token id as the label
                 label = [PAD_TOKEN_LABEL_ID] * _e['input_ids'].shape[1]
                 label[mask_position + len(self.sp_token_prefix)] = masked_token_id
                 _e['labels'] = torch.tensor([label], dtype=torch.long)
                 return _e
 
-            data.append([encode_mask(i) for i in range(min(self.max_length - len(self.sp_token_prefix), len(x)))])
+            if self.max_length is not None:
+                data.append([encode_mask(i) for i in range(min(self.max_length - len(self.sp_token_prefix), len(x)))])
+            else:
+                data.append([encode_mask(i) for i in range(len(x))])
 
         # get partition
         partition = get_partition(data)

@@ -27,7 +27,7 @@ compare two texts (positive and negative) and choose the one with lower perplexi
 ```python3
 import lmppl
 
-scorer = lmppl.LM('distilgpt2', max_length=64)
+scorer = lmppl.LM('distilgpt2')
 text = [
     'sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am happy.',
     'sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad.'
@@ -46,7 +46,7 @@ print(f"prediction: {text[ppl.index(min(ppl))]}")
 ```python3
 import lmppl
 
-scorer = lmppl.MaskedLM('distilbert-base-uncased', max_length=64)
+scorer = lmppl.MaskedLM('distilbert-base-uncased')
 text = [
     'sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am happy.',
     'sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad.'
@@ -66,7 +66,7 @@ print(f"prediction: {text[ppl.index(min(ppl))]}")
 ```python3
 import lmppl
 
-scorer = lmppl.EncoderDecoderLM('google/flan-t5-small', max_length_encoder=64, max_length_decoder=16)
+scorer = lmppl.EncoderDecoderLM('google/flan-t5-small')
 inputs = [
     'sentiment classification: I dropped my laptop on my knee, and someone stole my coffee.',
     'sentiment classification: I dropped my laptop on my knee, and someone stole my coffee.'
@@ -93,4 +93,3 @@ an optimal token length.
 - **Batch Size**: One can pass batch size to the function `get_perplexity` (eg. `get_perplexity(text, batch_size=32)`).
 As default, it will process all the text once, that may cause memory error if the number of texts is too large.
 
-- **DeBERTa**: DeBERTa model has a problem with their config files (the tokenizer's max token is incorrenct), so please specify the token length when use any DeBERTa. Eg.) `lmppl.MaskedLM('microsoft/deberta-v3-large', max_length=512)`.

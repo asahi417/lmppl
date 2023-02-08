@@ -50,9 +50,12 @@ class LM:
             model, local_files_only=local_files_only, use_auth_token=use_auth_token)
         self.model = transformers.AutoModelForCausalLM.from_pretrained(
             model, config=self.config, local_files_only=local_files_only, use_auth_token=use_auth_token)
-        self.max_length = max_length if max_length is not None else self.tokenizer.model_max_length
         self.tokenizer.pad_token = self.tokenizer.eos_token
-        assert self.max_length <= self.tokenizer.model_max_length, f"{self.max_length} > {self.tokenizer.model_max_length}"
+        if max_length is None:
+            self.max_length = None
+        else:
+            self.max_length = max_length if max_length is not None else self.tokenizer.model_max_length
+            assert self.max_length <= self.tokenizer.model_max_length, f"{self.max_length} > {self.tokenizer.model_max_length}"
 
         # loss function
         self.loss_fct = torch.nn.CrossEntropyLoss(reduction='none')
@@ -71,7 +74,12 @@ class LM:
         logging.info(f'\t * Num of GPU in use: {torch.cuda.device_count()}')
 
     def get_perplexity(self, input_texts: str or List, batch: int = None):
-        """ (pseudo) Perplexity """
+        """ Compute the perplexity on recurrent LM.
+
+        :param input_texts: A string or list of input texts for the encoder.
+        :param batch: Batch size
+        :return: A value or list of perplexity.
+        """
 
         # batch preparation
         single_input = type(input_texts) == str
@@ -85,15 +93,16 @@ class LM:
             for s, e in batch_id:
 
                 # run model inference
-                model_inputs = self.tokenizer(
-                    input_texts[s:e], max_length=self.max_length, truncation=True, padding='max_length',
-                    return_tensors='pt')
+                if self.max_length is not None:
+                    model_inputs = self.tokenizer(input_texts[s:e], max_length=self.max_length, truncation=True, padding='max_length', return_tensors='pt')
+                else:
+                    model_inputs = self.tokenizer(input_texts[s:e], truncation=True, padding=True, return_tensors='pt')
                 output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
 
                 # compute loss
                 label = model_inputs['input_ids']
                 label[label == self.tokenizer.eos_token_id] = PAD_TOKEN_LABEL_ID
-                loss = self.loss_fct(output['logits'].view(-1, self.config.vocab_size), label.view(-1))
+                loss = self.loss_fct(output['logits'].view(-1, self.config.vocab_size), label.to(self.device).view(-1))
                 loss = loss.view(len(output['logits']), -1)
                 loss_list += torch.mean(loss, -1).cpu().tolist()
 
@@ -103,5 +112,4 @@ class LM:
         if single_input:
             return ppl[0]
         return ppl
-
 

@@ -72,10 +72,16 @@ class EncoderDecoderLM:
 
         # load model
         self.tokenizer, self.model, self.config = get_lm(model, use_auth_token=use_auth_token)
-        self.max_length_encoder = max_length_encoder if max_length_encoder is not None else self.tokenizer.model_max_length
-        assert self.max_length_encoder <= self.tokenizer.model_max_length, f"{self.max_length_encoder} > {self.tokenizer.model_max_length}"
-        self.max_length_decoder = max_length_decoder if max_length_decoder is not None else self.tokenizer.model_max_length
-        assert self.max_length_decoder <= self.tokenizer.model_max_length, f"{self.max_length_decoder} > {self.tokenizer.model_max_length}"
+        if max_length_encoder is None:
+            self.max_length_encoder = None
+        else:
+            self.max_length_encoder = max_length_encoder if max_length_encoder is not None else self.tokenizer.model_max_length
+            assert self.max_length_encoder <= self.tokenizer.model_max_length, f"{self.max_length_encoder} > {self.tokenizer.model_max_length}"
+        if max_length_decoder is None:
+            self.max_length_decoder = None
+        else:
+            self.max_length_decoder = max_length_decoder if max_length_decoder is not None else self.tokenizer.model_max_length
+            assert self.max_length_decoder <= self.tokenizer.model_max_length, f"{self.max_length_decoder} > {self.tokenizer.model_max_length}"
 
         # loss function
         self.loss_fct = torch.nn.CrossEntropyLoss(ignore_index=self.tokenizer.pad_token_id, reduction='none')
@@ -117,10 +123,16 @@ class EncoderDecoderLM:
             for s, e in tqdm(batch_id):
 
                 # input feature
-                model_inputs = self.tokenizer(
-                    input_texts[s:e], return_tensors='pt', padding='max_length', truncation=True, max_length=self.max_length_encoder)
+                if self.max_length_encoder is not None:
+                    model_inputs = self.tokenizer(
+                        input_texts[s:e], return_tensors='pt', padding='max_length', truncation=True, max_length=self.max_length_encoder)
+                else:
+                    model_inputs = self.tokenizer(input_texts[s:e], return_tensors='pt', padding=True, truncation=True)
                 with self.tokenizer.as_target_tokenizer():
-                    labels = self.tokenizer(output_texts[s:e], return_tensors='pt', padding='max_length', truncation=True, max_length=self.max_length_decoder)
+                    if self.max_length_encoder is not None:
+                        labels = self.tokenizer(output_texts[s:e], return_tensors='pt', padding='max_length', truncation=True, max_length=self.max_length_decoder)
+                    else:
+                        labels = self.tokenizer(output_texts[s:e], return_tensors='pt', padding=True, truncation=True)
                     model_inputs["labels"] = labels["input_ids"]
 
                 # model run & loss conversion into likelihood
