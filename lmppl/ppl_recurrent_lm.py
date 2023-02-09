@@ -100,10 +100,10 @@ class LM:
                 output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
 
                 # compute loss
-                label = model_inputs['input_ids']
+                label = model_inputs['input_ids'].to(self.device)
                 label[label == self.tokenizer.eos_token_id] = PAD_TOKEN_LABEL_ID
                 valid_length = (label != PAD_TOKEN_LABEL_ID).sum(dim=-1)
-                loss = self.loss_fct(output['logits'].view(-1, self.config.vocab_size), label.to(self.device).view(-1))
+                loss = self.loss_fct(output['logits'].view(-1, self.config.vocab_size), label.view(-1))
                 loss = loss.view(len(output['logits']), -1)
                 loss = torch.sum(loss, -1) / valid_length
                 loss_list += loss.tolist()

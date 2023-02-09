@@ -17,7 +17,7 @@ flatten_choice = list(chain(*choices))
 flatten_index = list(chain(*[[n] * len(x) for n, x in enumerate(choices)]))
 
 
-model = LM('distilgpt2')
+model = LM('gpt2-xl')
 scores = model.get_perplexity(flatten_choice, batch=32)
 index_score = list(zip(flatten_index, scores))
 index_score_nested = [[s for i, s in index_score if x == i] for x in sorted(list(set(flatten_index)))]
