@@ -50,7 +50,8 @@ class LM:
             model, local_files_only=local_files_only, use_auth_token=use_auth_token)
         self.model = transformers.AutoModelForCausalLM.from_pretrained(
             model, config=self.config, local_files_only=local_files_only, use_auth_token=use_auth_token)
-        self.tokenizer.pad_token = self.tokenizer.eos_token
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = "<<PAD>>"
         if max_length is None:
             self.max_length = None
         else:
@@ -99,19 +100,19 @@ class LM:
                     model_inputs = self.tokenizer(input_texts[s:e], truncation=True, padding=True, return_tensors='pt')
                 output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
 
+                # shift the label sequence for causal inference
+                label = model_inputs['input_ids']
+                label[label == self.tokenizer.pad_token_id] = PAD_TOKEN_LABEL_ID
+                label = torch.concat([label[:, 1:], torch.tensor([[PAD_TOKEN_LABEL_ID] * label.shape[0]]).T], dim=1).to(self.device)
+
                 # compute loss
-                label = model_inputs['input_ids'].to(self.device)
-                label[label == self.tokenizer.eos_token_id] = PAD_TOKEN_LABEL_ID
                 valid_length = (label != PAD_TOKEN_LABEL_ID).sum(dim=-1)
                 loss = self.loss_fct(output['logits'].view(-1, self.config.vocab_size), label.view(-1))
                 loss = loss.view(len(output['logits']), -1)
                 loss = torch.sum(loss, -1) / valid_length
-                loss_list += loss.tolist()
+                loss_list += loss.cpu().tolist()
 
         # conversion to perplexity
         ppl = [exp(i) for i in loss_list]
-
-        if single_input:
-            return ppl[0]
-        return ppl
+        return ppl[0] if single_input else ppl
 

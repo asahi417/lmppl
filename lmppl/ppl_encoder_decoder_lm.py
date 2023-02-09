@@ -20,6 +20,7 @@ from .util import internet_connection
 
 os.environ["OMP_NUM_THREADS"] = "1"  # to turn off warning message
 os.environ["TOKENIZERS_PARALLELISM"] = "false"  # to turn off warning message
+PAD_TOKEN_LABEL_ID = torch.nn.CrossEntropyLoss().ignore_index
 
 
 def get_lm(model_name: str, use_auth_token: bool = False):
@@ -72,6 +73,8 @@ class EncoderDecoderLM:
 
         # load model
         self.tokenizer, self.model, self.config = get_lm(model, use_auth_token=use_auth_token)
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = "<<PAD>>"
         if max_length_encoder is None:
             self.max_length_encoder = None
         else:
@@ -84,7 +87,7 @@ class EncoderDecoderLM:
             assert self.max_length_decoder <= self.tokenizer.model_max_length, f"{self.max_length_decoder} > {self.tokenizer.model_max_length}"
 
         # loss function
-        self.loss_fct = torch.nn.CrossEntropyLoss(ignore_index=self.tokenizer.pad_token_id, reduction='none')
+        self.loss_fct = torch.nn.CrossEntropyLoss(reduction='none')
 
         # GPU setup
         if device is None:
@@ -128,27 +131,26 @@ class EncoderDecoderLM:
                         input_texts[s:e], return_tensors='pt', padding='max_length', truncation=True, max_length=self.max_length_encoder)
                 else:
                     model_inputs = self.tokenizer(input_texts[s:e], return_tensors='pt', padding=True, truncation=True)
-                with self.tokenizer.as_target_tokenizer():
-                    if self.max_length_encoder is not None:
-                        labels = self.tokenizer(output_texts[s:e], return_tensors='pt', padding='max_length', truncation=True, max_length=self.max_length_decoder)
-                    else:
-                        labels = self.tokenizer(output_texts[s:e], return_tensors='pt', padding=True, truncation=True)
-                    model_inputs["labels"] = labels["input_ids"]
+
+                if self.max_length_encoder is not None:
+                    output_encode = self.tokenizer(text_target=output_texts[s:e], return_tensors='pt', padding='max_length', truncation=True, max_length=self.max_length_decoder)
+                else:
+                    output_encode = self.tokenizer(text_target=output_texts[s:e], return_tensors='pt', padding=True, truncation=True)
+
+                # shift the label sequence for causal inference
+                label = output_encode["input_ids"]
+                label[label == self.tokenizer.pad_token_id] = PAD_TOKEN_LABEL_ID
+                label = torch.concat([label[:, 1:], torch.tensor([[PAD_TOKEN_LABEL_ID] * label.shape[0]]).T], dim=1).to(self.device)
+                model_inputs["labels"] = label
 
                 # model run & loss conversion into likelihood
-                out = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
-                loss = self.loss_fct(
-                    out['logits'].view(-1, out['logits'].size(-1)),
-                    model_inputs["labels"].view(-1).to(self.device)
-                )
-                loss_aligned = loss.view(out['logits'].size(0), out['logits'].size(1))
-                loss_final = loss_aligned.mean(-1)
-
-                # add to the list
-                loss_list += loss_final.cpu().numpy().tolist()
+                valid_length = (label != PAD_TOKEN_LABEL_ID).sum(dim=-1)
+                output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
+                loss = self.loss_fct(output['logits'].view(-1, self.config.vocab_size), label.view(-1))
+                loss = loss.view(len(output['logits']), -1)
+                loss = torch.sum(loss, -1) / valid_length
+                loss_list += loss.cpu().tolist()
 
         # conversion to perplexity
         ppl = [exp(i) for i in loss_list]
-
-        assert len(ppl) == len(input_texts), f"{len(ppl)} != {len(input_texts)}"
         return ppl[0] if single_input else ppl

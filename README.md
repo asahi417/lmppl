@@ -27,7 +27,7 @@ compare two texts (positive and negative) and choose the one with lower perplexi
 ```python3
 import lmppl
 
-scorer = lmppl.LM('distilgpt2')
+scorer = lmppl.LM('gpt2')
 text = [
     'sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am happy.',
     'sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad.'
@@ -35,18 +35,18 @@ text = [
 ppl = scorer.get_perplexity(text)
 print(list(zip(text, ppl)))
 >>> [
-  ('sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am happy.', 23.637200650208193),
-  ('sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad.', 23.457012413190245)
+  ('sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am happy.', 136.64255272925908),
+  ('sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad.', 139.2400838400971)
 ]
 print(f"prediction: {text[ppl.index(min(ppl))]}")
->>> "prediction: sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad."
+>>> "prediction: sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am happy."
 ```
 
 2. ***Masked LM*** including variants of BERT.
 ```python3
 import lmppl
 
-scorer = lmppl.MaskedLM('distilbert-base-uncased')
+scorer = lmppl.MaskedLM('microsoft/deberta-v3-small')
 text = [
     'sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am happy.',
     'sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad.'
@@ -54,8 +54,8 @@ text = [
 ppl = scorer.get_perplexity(text)
 print(list(zip(text, ppl)))
 >>> [
-  ('sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am happy.', 45.403336608291305),
-  ('sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad.', 44.85423209906894)
+  ('sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am happy.', 1190212.1699246117),
+  ('sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad.', 1152767.482071837)
 ]
 print(f"prediction: {text[ppl.index(min(ppl))]}")
 >>> "prediction: sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad."
@@ -78,8 +78,8 @@ outputs = [
 ppl = scorer.get_perplexity(input_texts=inputs, output_texts=outputs)
 print(list(zip(outputs, ppl)))
 >>> [
-  ('I am happy.', 10.555328485728035),
-  ('I am sad.', 8.517949768969348)
+  ('I am happy.', 4138.748977714201),
+  ('I am sad.', 2991.629250051472)
 ]
 print(f"prediction: {outputs[ppl.index(min(ppl))]}")
 >>> "prediction: I am sad."
