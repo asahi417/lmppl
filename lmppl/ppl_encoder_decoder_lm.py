@@ -23,7 +23,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"  # to turn off warning message
 PAD_TOKEN_LABEL_ID = torch.nn.CrossEntropyLoss().ignore_index
 
 
-def get_lm(model_name: str, use_auth_token: bool = False):
+def get_lm(model_name: str, use_auth_token: bool = False, torch_dtype = None):
     """ get encoder-decoder lms from huggingface """
     # tokenizer
     local_files_only = not internet_connection()
@@ -47,9 +47,12 @@ def get_lm(model_name: str, use_auth_token: bool = False):
         model_class = transformers.SwitchTransformersForConditionalGeneration.from_pretrained
     else:
         raise ValueError(f'unsupported model type: {config.model_type}')
-    model = model_class(
-        model_name, config=config, local_files_only=local_files_only, use_auth_token=use_auth_token)
-
+    if torch_dtype is None:
+        model = model_class(
+            model_name, config=config, local_files_only=local_files_only, use_auth_token=use_auth_token)
+    else:
+        model = model_class(
+            model_name, config=config, local_files_only=local_files_only, use_auth_token=use_auth_token, torch_dtype=torch_dtype)
     # add new special tokens to the tokenizer and the model if they don't have it
     return tokenizer, model, config
 
@@ -63,7 +66,8 @@ class EncoderDecoderLM:
                  max_length_encoder: int = None,
                  max_length_decoder: int = None,
                  device: str = None,
-                 num_gpus: int = None):
+                 num_gpus: int = None,
+                 torch_dtype=None):
         """ Encoder-Decoder Language Model.
 
         @param model: Model alias or path to local model file.

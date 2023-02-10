@@ -32,7 +32,8 @@ class MaskedLM:
                  use_auth_token: bool = False,
                  max_length: int = None,
                  device: str = None,
-                 num_gpus: int = None):
+                 num_gpus: int = None,
+                 torch_dtype=None):
         """ Masked Language Model.
 
         @param model: Model alias or path to local model file.
@@ -48,8 +49,13 @@ class MaskedLM:
             model, local_files_only=local_files_only, use_auth_token=use_auth_token)
         self.config = transformers.AutoConfig.from_pretrained(
             model, local_files_only=local_files_only, use_auth_token=use_auth_token)
-        self.model = transformers.AutoModelForMaskedLM.from_pretrained(
-            model, config=self.config, local_files_only=local_files_only, use_auth_token=use_auth_token)
+        if torch_dtype is None:
+            self.model = transformers.AutoModelForMaskedLM.from_pretrained(
+                model, config=self.config, local_files_only=local_files_only, use_auth_token=use_auth_token)
+        else:
+            self.model = transformers.AutoModelForMaskedLM.from_pretrained(
+                model, config=self.config, local_files_only=local_files_only, use_auth_token=use_auth_token,
+                torch_dtype=torch_dtype)
         if max_length is None:
             self.max_length = None
         else:

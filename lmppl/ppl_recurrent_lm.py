@@ -33,7 +33,7 @@ class LM:
                  max_length: int = None,
                  device: str = None,
                  num_gpus: int = None,
-                 torch_dtype = None):
+                 torch_dtype=None):
         """ Language Model.
 
         @param model: Model alias or path to local model file.
