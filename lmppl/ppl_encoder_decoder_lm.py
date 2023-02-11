@@ -57,6 +57,8 @@ def get_lm(model_name: str,
     if device_map is not None:
         param['device_map'] = device_map
     model = model_class(model_name, **param)
+    if model.config.decoder_start_token_id is None:
+        model.config.decoder_start_token_id = tokenizer.pad_token_id
     return tokenizer, model, config
 
 
