@@ -31,7 +31,6 @@ class LM:
                  model: str = 'distilgpt2',
                  use_auth_token: bool = False,
                  max_length: int = None,
-                 device: str = None,
                  num_gpus: int = None,
                  torch_dtype=None,
                  device_map: str = None,
@@ -52,8 +51,7 @@ class LM:
         self.config = transformers.AutoConfig.from_pretrained(
             model, local_files_only=local_files_only, use_auth_token=use_auth_token)
 
-        param = {"config": self.config, "local_files_only": local_files_only, "use_auth_token": use_auth_token,
-                 "low_cpu_mem_usage": low_cpu_mem_usage}
+        param = {"config": self.config, "local_files_only": local_files_only, "use_auth_token": use_auth_token, "low_cpu_mem_usage": low_cpu_mem_usage}
         if torch_dtype is not None:
             param['torch_dtype'] = torch_dtype
         if device_map is not None:
@@ -72,17 +70,13 @@ class LM:
         self.loss_fct = torch.nn.CrossEntropyLoss(reduction='none')
 
         # GPU setup
-        if device is None:
-            self.device = 'cuda' if torch.cuda.device_count() > 0 else 'cpu'
-        else:
-            self.device = device
-        num_gpus = torch.cuda.device_count() if num_gpus is None else num_gpus
-        if num_gpus > 1:
-            self.parallel = True
-            self.model = torch.nn.DataParallel(self.model)
-        self.model.to(self.device)
+        if device_map is None:
+            num_gpus = torch.cuda.device_count() if num_gpus is None else num_gpus
+            if num_gpus > 0:
+                self.model = torch.nn.DataParallel(self.model) if num_gpus > 1 else self.model
+                self.model.to('cuda')
+        logging.info(f'\t * model is loaded on: {self.model.device}')
         self.model.eval()
-        logging.info(f'\t * Num of GPU in use: {torch.cuda.device_count()}')
 
     def get_perplexity(self, input_texts: str or List, batch: int = None):
         """ Compute the perplexity on recurrent LM.
@@ -108,12 +102,12 @@ class LM:
                     model_inputs = self.tokenizer(input_texts[s:e], max_length=self.max_length, truncation=True, padding='max_length', return_tensors='pt')
                 else:
                     model_inputs = self.tokenizer(input_texts[s:e], truncation=True, padding=True, return_tensors='pt')
-                output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
+                output = self.model(**{k: v.to(self.model.device) for k, v in model_inputs.items()})
 
                 # shift the label sequence for causal inference
                 label = model_inputs['input_ids']
                 label[label == self.tokenizer.pad_token_id] = PAD_TOKEN_LABEL_ID
-                label = torch.concat([label[:, 1:], torch.tensor([[PAD_TOKEN_LABEL_ID] * label.shape[0]]).T], dim=1).to(self.device)
+                label = torch.concat([label[:, 1:], torch.tensor([[PAD_TOKEN_LABEL_ID] * label.shape[0]]).T], dim=1).to(self.model.device)
 
                 # compute loss
                 valid_length = (label != PAD_TOKEN_LABEL_ID).sum(dim=-1)
@@ -126,3 +120,7 @@ class LM:
         ppl = [exp(i) for i in loss_list]
         return ppl[0] if single_input else ppl
 
+
+# if __name__ == '__main__':
+#     model = LM("EleutherAI/gpt-neox-20b", device_map="auto", low_cpu_mem_usage=True)
+#     model.get_perplexity("Hello world")

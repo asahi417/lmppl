@@ -31,7 +31,6 @@ class MaskedLM:
                  model: str = 'distilbert-base-uncased',
                  use_auth_token: bool = False,
                  max_length: int = None,
-                 device: str = None,
                  num_gpus: int = None,
                  torch_dtype=None,
                  device_map: str = None,
@@ -75,17 +74,13 @@ class MaskedLM:
         self.mask_token = self.tokenizer.mask_token
 
         # GPU setup
-        if device is None:
-            self.device = 'cuda' if torch.cuda.device_count() > 0 else 'cpu'
-        else:
-            self.device = device
-        num_gpus = torch.cuda.device_count() if num_gpus is None else num_gpus
-        if num_gpus > 1:
-            self.parallel = True
-            self.model = torch.nn.DataParallel(self.model)
-        self.model.to(self.device)
+        if device_map is None:
+            num_gpus = torch.cuda.device_count() if num_gpus is None else num_gpus
+            if num_gpus > 0:
+                self.model = torch.nn.DataParallel(self.model) if num_gpus > 1 else self.model
+                self.model.to('cuda')
+        logging.info(f'\t * model is loaded on: {self.model.device}')
         self.model.eval()
-        logging.info(f'\t * Num of GPU in use: {torch.cuda.device_count()}')
 
     def get_perplexity(self, input_texts: str or List, batch: int = None):
         """ Compute the perplexity on MLM.
@@ -146,7 +141,7 @@ class MaskedLM:
         with torch.no_grad():
             for s, e in tqdm(batch_id):
                 _encode = data[s:e]
-                _encode = {k: torch.cat([o[k] for o in _encode], dim=0).to(self.device) for k in _encode[0].keys()}
+                _encode = {k: torch.cat([o[k] for o in _encode], dim=0).to(self.model.device) for k in _encode[0].keys()}
                 labels = _encode.pop('labels')
                 output = self.model(**_encode, return_dict=True)
                 prediction_scores = output['logits']
