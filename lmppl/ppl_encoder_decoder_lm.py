@@ -141,7 +141,7 @@ class EncoderDecoderLM:
                 else:
                     model_inputs = self.tokenizer(input_texts[s:e], return_tensors='pt', padding=True, truncation=True)
 
-                if self.max_length_encoder is not None:
+                if self.max_length_decoder is not None:
                     output_encode = self.tokenizer(text_target=output_texts[s:e], return_tensors='pt', padding='max_length', truncation=True, max_length=self.max_length_decoder)
                 else:
                     output_encode = self.tokenizer(text_target=output_texts[s:e], return_tensors='pt', padding=True, truncation=True)
