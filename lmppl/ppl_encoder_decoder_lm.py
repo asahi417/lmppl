@@ -159,7 +159,7 @@ class EncoderDecoderLM:
                 model_inputs["labels"] = label.to(self.device)
 
                 # model run & loss conversion into likelihood
-                valid_length = (label != PAD_TOKEN_LABEL_ID).sum(dim=-1)
+                valid_length = (model_inputs["labels"] != PAD_TOKEN_LABEL_ID).sum(dim=-1)
                 output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
                 loss = self.loss_fct(output['logits'].view(-1, self.config.vocab_size), model_inputs["labels"].view(-1))
                 loss = loss.view(len(output['logits']), -1)
