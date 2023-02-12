@@ -149,7 +149,6 @@ class EncoderDecoderLM:
                 # shift the label sequence for causal inference
                 label = output_encode["input_ids"]
                 label[label == self.tokenizer.pad_token_id] = PAD_TOKEN_LABEL_ID
-                # label = torch.concat([label[:, 1:], torch.tensor([[PAD_TOKEN_LABEL_ID] * label.shape[0]]).T], dim=1)
                 model_inputs["labels"] = label.to(self.model.device)
 
                 # model run & loss conversion into likelihood
