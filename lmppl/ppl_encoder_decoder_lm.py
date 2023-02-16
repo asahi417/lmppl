@@ -103,13 +103,14 @@ class EncoderDecoderLM:
         self.loss_fct = torch.nn.CrossEntropyLoss(reduction='none')
 
         # GPU setup
+        self.device = self.model.device
         if device_map is None:
             num_gpus = torch.cuda.device_count() if num_gpus is None else num_gpus
             if num_gpus > 0:
-                self.model = torch.nn.DataParallel(self.model) if num_gpus > 1 else self.model
+                self.model = torch.nn.DataParallel(self.model)
                 self.model.to('cuda')
-        logging.info(f'\t * model is loaded on: {self.model.device}')
         self.model.eval()
+        logging.info(f'\t * model is loaded on: {self.device}')
 
     def get_perplexity(self, input_texts: str or List, output_texts: str or List, batch: int = None):
         """ Compute the perplexity on decoder of the seq2seq model.
@@ -149,11 +150,11 @@ class EncoderDecoderLM:
                 # shift the label sequence for causal inference
                 label = output_encode["input_ids"]
                 label[label == self.tokenizer.pad_token_id] = PAD_TOKEN_LABEL_ID
-                model_inputs["labels"] = label.to(self.model.device)
+                model_inputs["labels"] = label.to(self.device)
 
                 # model run & loss conversion into likelihood
                 valid_length = (model_inputs["labels"] != PAD_TOKEN_LABEL_ID).sum(dim=-1)
-                output = self.model(**{k: v.to(self.model.device) for k, v in model_inputs.items()})
+                output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
                 loss = self.loss_fct(output['logits'].view(-1, self.config.vocab_size), model_inputs["labels"].view(-1))
                 loss = loss.view(len(output['logits']), -1)
                 loss = torch.sum(loss, -1) / valid_length
