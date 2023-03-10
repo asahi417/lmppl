@@ -34,7 +34,8 @@ class MaskedLM:
                  num_gpus: int = None,
                  torch_dtype=None,
                  device_map: str = None,
-                 low_cpu_mem_usage: bool = False):
+                 low_cpu_mem_usage: bool = False,
+                 hf_cache_dir: str = None):
         """ Masked Language Model.
 
         @param model: Model alias or path to local model file.
@@ -45,18 +46,17 @@ class MaskedLM:
         logging.info(f'Loading Model: `{model}`')
 
         # load model
-        local_files_only = not internet_connection()
-        self.tokenizer = transformers.AutoTokenizer.from_pretrained(
-            model, local_files_only=local_files_only, use_auth_token=use_auth_token)
-        self.config = transformers.AutoConfig.from_pretrained(
-            model, local_files_only=local_files_only, use_auth_token=use_auth_token)
-        param = {"config": self.config, "local_files_only": local_files_only, "use_auth_token": use_auth_token,
-                 "low_cpu_mem_usage": low_cpu_mem_usage}
+        params = {"local_files_only": not internet_connection(), "use_auth_token": use_auth_token}
+        if hf_cache_dir is not None:
+            params["cache_dir"] = hf_cache_dir
+        self.tokenizer = transformers.AutoTokenizer.from_pretrained(model, **params)
+        self.config = transformers.AutoConfig.from_pretrained(model, **params)
+        params.update({"config": self.config, "low_cpu_mem_usage": low_cpu_mem_usage})
         if torch_dtype is not None:
-            param['torch_dtype'] = torch_dtype
+            params['torch_dtype'] = torch_dtype
         if device_map is not None:
-            param['device_map'] = device_map
-        self.model = transformers.AutoModelForMaskedLM.from_pretrained(model, **param)
+            params['device_map'] = device_map
+        self.model = transformers.AutoModelForMaskedLM.from_pretrained(model, **params)
         if max_length is None:
             self.max_length = None
         else:

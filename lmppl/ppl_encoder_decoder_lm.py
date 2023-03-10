@@ -27,16 +27,17 @@ def get_lm(model_name: str,
            use_auth_token: bool = False,
            torch_dtype=None,
            device_map: str = None,
-           low_cpu_mem_usage: bool = False):
+           low_cpu_mem_usage: bool = False,
+           hf_cache_dir: str = None):
     """ get encoder-decoder lms from huggingface """
     # tokenizer
-    local_files_only = not internet_connection()
-    tokenizer = transformers.AutoTokenizer.from_pretrained(
-        model_name, local_files_only=local_files_only, use_auth_token=use_auth_token)
+    params = {"local_files_only": not internet_connection(), "use_auth_token": use_auth_token}
+    if hf_cache_dir is not None:
+        params["cache_dir"] = hf_cache_dir
+    tokenizer = transformers.AutoTokenizer.from_pretrained(model_name, **params)
 
     # config
-    config = transformers.AutoConfig.from_pretrained(
-        model_name, local_files_only=local_files_only, use_auth_token=use_auth_token)
+    config = transformers.AutoConfig.from_pretrained(model_name, **params)
 
     # model
     if config.model_type == 't5':  # T5 model requires T5ForConditionalGeneration class
@@ -51,12 +52,12 @@ def get_lm(model_name: str,
         model_class = transformers.SwitchTransformersForConditionalGeneration.from_pretrained
     else:
         raise ValueError(f'unsupported model type: {config.model_type}')
-    param = {'config': config, "local_files_only": local_files_only, "use_auth_token": use_auth_token, "low_cpu_mem_usage": low_cpu_mem_usage}
+    params.update({'config': config, "low_cpu_mem_usage": low_cpu_mem_usage})
     if torch_dtype is not None:
-        param['torch_dtype'] = torch_dtype
+        params['torch_dtype'] = torch_dtype
     if device_map is not None:
-        param['device_map'] = device_map
-    model = model_class(model_name, **param)
+        params['device_map'] = device_map
+    model = model_class(model_name, **params)
     if model.config.decoder_start_token_id is None:
         model.config.decoder_start_token_id = tokenizer.pad_token_id
     return tokenizer, model, config
@@ -73,7 +74,8 @@ class EncoderDecoderLM:
                  num_gpus: int = None,
                  torch_dtype=None,
                  device_map: str = None,
-                 low_cpu_mem_usage: bool = False):
+                 low_cpu_mem_usage: bool = False,
+                 hf_cache_dir: str = None):
         """ Encoder-Decoder Language Model.
 
         @param model: Model alias or path to local model file.
@@ -85,7 +87,8 @@ class EncoderDecoderLM:
 
         # load model
         self.tokenizer, self.model, self.config = get_lm(
-            model, use_auth_token=use_auth_token, torch_dtype=torch_dtype, device_map=device_map, low_cpu_mem_usage=low_cpu_mem_usage)
+            model, use_auth_token=use_auth_token, torch_dtype=torch_dtype, device_map=device_map,
+            low_cpu_mem_usage=low_cpu_mem_usage, hf_cache_dir=hf_cache_dir)
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = "<<PAD>>"
         if max_length_encoder is None:
@@ -106,9 +109,13 @@ class EncoderDecoderLM:
         self.device = self.model.device
         if device_map is None:
             num_gpus = torch.cuda.device_count() if num_gpus is None else num_gpus
-            if num_gpus > 0:
+            if num_gpus == 1:
+                self.model.to('cuda')
+                self.device = self.model.device
+            elif num_gpus > 1:
                 self.model = torch.nn.DataParallel(self.model)
                 self.model.to('cuda')
+                self.device = self.model.module.device
         self.model.eval()
         logging.info(f'\t * model is loaded on: {self.device}')
 
