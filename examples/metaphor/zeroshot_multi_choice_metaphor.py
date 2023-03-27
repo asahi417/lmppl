@@ -1,8 +1,11 @@
 """ Solving Metaphor Detection via Prompting
 for k, v in language_models.items():
     v[1](k)
+for i in dataset_list:
+    load_dataset(i[0], i[1])
 """
 import json
+import ast
 import logging
 import os
 import gc
@@ -90,16 +93,16 @@ def get_input(query_pair: List, candidate_pairs: List, encoder_decoder: bool = F
 
 
 def get_ppl(scoring_model, data, data_name, data_split, batch_size):
-    # data = 'Joanne/Metaphors_and_Analogies'
-    # data_name = 'Pairs_Jankowiac_set'
-    # data_split = 'test'
+    data = 'Joanne/Metaphors_and_Analogies'
+    data_name = 'Quadruples_Green_set'
+    data_split = 'test'
     # dataset setup
     encoder_decoder = type(scoring_model) is lmppl.EncoderDecoderLM
     dataset = load_dataset(data, data_name, split=data_split)
     answer = dataset['answer']
     labels = dataset['labels']
     if data_name == "Quadruples_Green_set":
-        dataset_prompt = [[template_four_words(i['stem'] + c, encoder_decoder) for c in i['pairs']] for i in dataset]
+        dataset_prompt = [[template_four_words(ast.literal_eval(i['stem']) + c, encoder_decoder) for c in i['pairs']] for i in dataset]
     elif data_name in ["Pairs_Cardillo_set", "Pairs_Jankowiac_set"]:
         dataset_prompt = [[template_sentence(s, encoder_decoder) for s in i['sentences']] for i in dataset]
     else:
@@ -136,7 +139,7 @@ if __name__ == '__main__':
             scores_file = f"metaphor_results/scores/{os.path.basename(target_model)}.{os.path.basename(target_data)}_{target_data_name}_{target_split}.json"
             if not os.path.exists(scores_file):
                 if scorer is None:
-                    scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(target_model, low_cpu_mem_usage=True)
+                    scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(target_model, device_map='auto', low_cpu_mem_usage=True)
                 logging.info(f"[COMUTING PERPLEXITY] model: `{target_model}`, data: `{target_data}/{target_data_name}/{target_split}`")
                 scores_dict = get_ppl(scorer, target_data, target_data_name, target_split, batch)
                 with open(scores_file, 'w') as f:
