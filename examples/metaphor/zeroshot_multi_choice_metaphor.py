@@ -56,7 +56,7 @@ language_models = {
     "facebook/opt-iml-30b": [lmppl.LM, 2],  # 30B
     "facebook/opt-iml-max-30b": [lmppl.LM, 4],  # 30B
     "facebook/opt-30b": [lmppl.LM, 4],  # 30B
-    "google/flan-t5-xxl": [lmppl.EncoderDecoderLM, 8],  # 11B
+    "google/flan-t5-xxl": [lmppl.EncoderDecoderLM, 4],  # 11B
     "t5-11b": [lmppl.EncoderDecoderLM, 4],  # 11B
     "t5-3b": [lmppl.EncoderDecoderLM, 16],  # 3B
     "EleutherAI/gpt-j-6B": [lmppl.LM, 16],  # 6B
