@@ -45,17 +45,17 @@ def template_sentence(sentence: str, separate_in_out: bool):
 dataset_list = [  # dataset, dataset_name, split
     ['Joanne/Metaphors_and_Analogies', "Quadruples_Green_set", "test"],
     # ['Joanne/Metaphors_and_Analogies', 'Pairs_Cardillo_set', "test"],
-    # ['Joanne/Metaphors_and_Analogies', 'Pairs_Jankowiac_set', "test"],
+    ['Joanne/Metaphors_and_Analogies', 'Pairs_Jankowiac_set', "test"],
 ]
 
 language_models = {
     "gpt2-xl": [lmppl.LM, 32],  # 1.5B
     "google/ul2": [lmppl.EncoderDecoderLM, 4],  # 20B
     "google/flan-ul2": [lmppl.EncoderDecoderLM, 4],  # 20B
-    "EleutherAI/gpt-neox-20b": [lmppl.LM, 1],  # 20B
-    "facebook/opt-iml-30b": [lmppl.LM, 2],  # 30B
-    "facebook/opt-iml-max-30b": [lmppl.LM, 2],  # 30B
-    "facebook/opt-30b": [lmppl.LM, 2],  # 30B
+    # "EleutherAI/gpt-neox-20b": [lmppl.LM, 1],  # 20B
+    # "facebook/opt-iml-30b": [lmppl.LM, 2],  # 30B
+    # "facebook/opt-iml-max-30b": [lmppl.LM, 2],  # 30B
+    # "facebook/opt-30b": [lmppl.LM, 2],  # 30B
     "google/flan-t5-xxl": [lmppl.EncoderDecoderLM, 8],  # 11B
     "t5-11b": [lmppl.EncoderDecoderLM, 2],  # 11B
     "t5-3b": [lmppl.EncoderDecoderLM, 16],  # 3B
