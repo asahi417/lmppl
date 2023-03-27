@@ -165,7 +165,7 @@ class EncoderDecoderLM:
                 else:
                     model_inputs["labels"] = label
                     output = self.model(**{k: v.cuda() for k, v in model_inputs.items()})
-                    # output = self.model(**model_inputs)
+                    model_inputs["labels"] = label.to(self.device)
 
                 # model run & loss conversion into likelihood
                 valid_length = (model_inputs["labels"] != PAD_TOKEN_LABEL_ID).sum(dim=-1)
