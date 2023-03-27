@@ -158,11 +158,12 @@ class EncoderDecoderLM:
                 label = output_encode["input_ids"]
                 label[label == self.tokenizer.pad_token_id] = PAD_TOKEN_LABEL_ID
                 # model_inputs["labels"] = label.to(self.device)
-                output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
+                # output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
+                output = self.model(**model_inputs)
                 # output = self.model(**{k: v.cuda() for k, v in model_inputs.items()})
 
                 # model run & loss conversion into likelihood
-                valid_length = (model_inputs["labels"] != PAD_TOKEN_LABEL_ID).sum(dim=-1)
+                valid_length = (label != PAD_TOKEN_LABEL_ID).sum(dim=-1)
                 loss = self.loss_fct(output['logits'].view(-1, self.config.vocab_size), model_inputs["labels"].view(-1))
                 loss = loss.view(len(output['logits']), -1)
                 loss = torch.sum(loss, -1) / valid_length
