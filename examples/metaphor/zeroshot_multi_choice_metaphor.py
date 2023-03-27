@@ -85,17 +85,10 @@ language_models = {
 }
 
 
-def get_input(query_pair: List, candidate_pairs: List, encoder_decoder: bool = False):
-    _template_header = template_header.replace('<subj-a>', query_pair[0]).replace('<obj-a>', query_pair[1])
-    if encoder_decoder:
-        return [[f"generate analogy: {_template_header}", template_footer.replace('<subj-b>', a).replace('<obj-b>', b)] for a, b in candidate_pairs]
-    return [[_template_header, template_footer.replace('<subj-b>', a).replace('<obj-b>', b)] for a, b in candidate_pairs]
-
-
 def get_ppl(scoring_model, data, data_name, data_split, batch_size):
-    data = 'Joanne/Metaphors_and_Analogies'
-    data_name = 'Quadruples_Green_set'
-    data_split = 'test'
+    # data = 'Joanne/Metaphors_and_Analogies'
+    # data_name = 'Quadruples_Green_set'
+    # data_split = 'test'
     # dataset setup
     encoder_decoder = type(scoring_model) is lmppl.EncoderDecoderLM
     dataset = load_dataset(data, data_name, split=data_split)

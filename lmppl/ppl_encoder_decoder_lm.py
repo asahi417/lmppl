@@ -110,11 +110,11 @@ class EncoderDecoderLM:
         if device_map is None:
             num_gpus = torch.cuda.device_count() if num_gpus is None else num_gpus
             if num_gpus == 1:
-                self.model.to('cuda')
+                self.model.cuda()
                 self.device = self.model.device
             elif num_gpus > 1:
-                self.model = torch.nn.DataParallel(self.model)
-                self.model.to('cuda')
+                # self.model = torch.nn.DataParallel(self.model)
+                self.model.cuda()
                 self.device = self.model.module.device
         self.model.eval()
         logging.info(f'\t * model is loaded on: {self.device}')
@@ -161,7 +161,8 @@ class EncoderDecoderLM:
 
                 # model run & loss conversion into likelihood
                 valid_length = (model_inputs["labels"] != PAD_TOKEN_LABEL_ID).sum(dim=-1)
-                output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
+                # output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
+                output = self.model(**{k: v.cuda() for k, v in model_inputs.items()})
                 loss = self.loss_fct(output['logits'].view(-1, self.config.vocab_size), model_inputs["labels"].view(-1))
                 loss = loss.view(len(output['logits']), -1)
                 loss = torch.sum(loss, -1) / valid_length
