@@ -43,9 +43,9 @@ def template_sentence(sentence: str, separate_in_out: bool):
     return [f"{a} {b}" for a, b in choice]
 
 dataset_list = [  # dataset, dataset_name, split
-    ['Joanne/Metaphors_and_Analogies', "Quadruples_Green_set", "test"],
+    # ['Joanne/Metaphors_and_Analogies', "Quadruples_Green_set", "test"],
     # ['Joanne/Metaphors_and_Analogies', 'Pairs_Cardillo_set', "test"],
-    # ['Joanne/Metaphors_and_Analogies', 'Pairs_Jankowiac_set', "test"],
+    ['Joanne/Metaphors_and_Analogies', 'Pairs_Jankowiac_set', "test"],
 ]
 
 language_models = {
