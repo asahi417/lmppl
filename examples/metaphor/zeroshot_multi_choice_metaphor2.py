@@ -50,8 +50,8 @@ dataset_list = [  # dataset, dataset_name, split
 
 language_models = {
     "gpt2-xl": [lmppl.LM, 32],  # 1.5B
-    "google/ul2": [lmppl.EncoderDecoderLM, 4],  # 20B
-    "google/flan-ul2": [lmppl.EncoderDecoderLM, 4],  # 20B
+    # "google/ul2": [lmppl.EncoderDecoderLM, 4],  # 20B
+    # "google/flan-ul2": [lmppl.EncoderDecoderLM, 4],  # 20B
     # "EleutherAI/gpt-neox-20b": [lmppl.LM, 1],  # 20B
     # "facebook/opt-iml-30b": [lmppl.LM, 2],  # 30B
     # "facebook/opt-iml-max-30b": [lmppl.LM, 2],  # 30B
