@@ -157,7 +157,7 @@ class EncoderDecoderLM:
                 # shift the label sequence for causal inference
                 label = output_encode["input_ids"]
                 label[label == self.tokenizer.pad_token_id] = PAD_TOKEN_LABEL_ID
-                model_inputs["labels"] = label.to(self.device)
+                # model_inputs["labels"] = label.to(self.device)
 
                 # model run & loss conversion into likelihood
                 valid_length = (model_inputs["labels"] != PAD_TOKEN_LABEL_ID).sum(dim=-1)
