@@ -86,8 +86,9 @@ class EncoderDecoderLM:
         logging.info(f'Loading Model: `{model}`')
 
         # load model
+        self.device_map = device_map
         self.tokenizer, self.model, self.config = get_lm(
-            model, use_auth_token=use_auth_token, torch_dtype=torch_dtype, device_map=device_map,
+            model, use_auth_token=use_auth_token, torch_dtype=torch_dtype, device_map=self.device_map,
             low_cpu_mem_usage=low_cpu_mem_usage, hf_cache_dir=hf_cache_dir)
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = "<<PAD>>"
@@ -107,13 +108,13 @@ class EncoderDecoderLM:
 
         # GPU setup
         self.device = self.model.device
-        if device_map is None:
+        if self.device_map is None:
             num_gpus = torch.cuda.device_count() if num_gpus is None else num_gpus
             if num_gpus == 1:
                 self.model.cuda()
                 self.device = self.model.device
             elif num_gpus > 1:
-                # self.model = torch.nn.DataParallel(self.model)
+                self.model = torch.nn.DataParallel(self.model)
                 self.model.cuda()
                 self.device = self.model.module.device
         self.model.eval()
@@ -159,6 +160,7 @@ class EncoderDecoderLM:
                 label[label == self.tokenizer.pad_token_id] = PAD_TOKEN_LABEL_ID
                 # model_inputs["labels"] = label.to(self.device)
                 # output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
+                model_inputs["labels"] = label
                 output = self.model(**model_inputs)
                 # output = self.model(**{k: v.cuda() for k, v in model_inputs.items()})
 
