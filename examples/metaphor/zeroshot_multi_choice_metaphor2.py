@@ -50,14 +50,14 @@ dataset_list = [  # dataset, dataset_name, split
 
 language_models = {
     "gpt2-xl": [lmppl.LM, 32],  # 1.5B
-    # "google/ul2": [lmppl.EncoderDecoderLM, 4],  # 20B
-    # "google/flan-ul2": [lmppl.EncoderDecoderLM, 4],  # 20B
-    # "EleutherAI/gpt-neox-20b": [lmppl.LM, 1],  # 20B
-    # "facebook/opt-iml-30b": [lmppl.LM, 2],  # 30B
-    # "facebook/opt-iml-max-30b": [lmppl.LM, 2],  # 30B
-    # "facebook/opt-30b": [lmppl.LM, 2],  # 30B
-    # "google/flan-t5-xxl": [lmppl.EncoderDecoderLM, 8],  # 11B
-    # "t5-11b": [lmppl.EncoderDecoderLM, 2],  # 11B
+    "google/ul2": [lmppl.EncoderDecoderLM, 2],  # 20B
+    "google/flan-ul2": [lmppl.EncoderDecoderLM, 2],  # 20B
+    "EleutherAI/gpt-neox-20b": [lmppl.LM, 1],  # 20B
+    "facebook/opt-iml-30b": [lmppl.LM, 1],  # 30B
+    "facebook/opt-iml-max-30b": [lmppl.LM, 1],  # 30B
+    "facebook/opt-30b": [lmppl.LM, 1],  # 30B
+    "google/flan-t5-xxl": [lmppl.EncoderDecoderLM, 4],  # 11B
+    "t5-11b": [lmppl.EncoderDecoderLM, 4],  # 11B
     "t5-3b": [lmppl.EncoderDecoderLM, 16],  # 3B
     "EleutherAI/gpt-j-6B": [lmppl.LM, 16],  # 6B
     "google/flan-t5-xl": [lmppl.EncoderDecoderLM, 16],  # 3B
