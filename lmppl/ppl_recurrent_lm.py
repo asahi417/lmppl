@@ -61,7 +61,7 @@ class LM:
         self.model = transformers.AutoModelForCausalLM.from_pretrained(model, **params)
 
         if self.tokenizer.pad_token is None:
-            self.tokenizer.pad_token = "<<PAD>>"
+            self.tokenizer.add_special_tokens({'pad_token': "<<PAD>>"})
         if max_length is None:
             self.max_length = None
         else:
