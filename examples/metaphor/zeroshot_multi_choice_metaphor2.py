@@ -44,23 +44,23 @@ def template_sentence(sentence: str, separate_in_out: bool):
 
 dataset_list = [  # dataset, dataset_name, split
     ['Joanne/Metaphors_and_Analogies', "Quadruples_Green_set", "test"],
-    # ['Joanne/Metaphors_and_Analogies', 'Pairs_Cardillo_set', "test"],
-    # ['Joanne/Metaphors_and_Analogies', 'Pairs_Jankowiac_set', "test"],
+    ['Joanne/Metaphors_and_Analogies', 'Pairs_Cardillo_set', "test"],
+    ['Joanne/Metaphors_and_Analogies', 'Pairs_Jankowiac_set', "test"],
 ]
 
 language_models = {
-    "google/ul2": [lmppl.EncoderDecoderLM, 1],  # 20B
-    "google/flan-ul2": [lmppl.EncoderDecoderLM, 1],  # 20B
-    "EleutherAI/gpt-neox-20b": [lmppl.LM, 1],  # 20B
-    "facebook/opt-iml-30b": [lmppl.LM, 1],  # 30B
-    "facebook/opt-iml-max-30b": [lmppl.LM, 1],  # 30B
-    "facebook/opt-30b": [lmppl.LM, 1],  # 30B
-    "google/flan-t5-xxl": [lmppl.EncoderDecoderLM, 1],  # 11B
-    "t5-11b": [lmppl.EncoderDecoderLM, 1],  # 11B
-    "t5-3b": [lmppl.EncoderDecoderLM, 4],  # 3B
-    "EleutherAI/gpt-j-6B": [lmppl.LM, 4],  # 6B
-    "google/flan-t5-xl": [lmppl.EncoderDecoderLM, 4],  # 3B
-    "EleutherAI/gpt-neo-2.7B": [lmppl.LM, 8],  # 2.7B
+    # "google/ul2": [lmppl.EncoderDecoderLM, 1],  # 20B
+    # "google/flan-ul2": [lmppl.EncoderDecoderLM, 1],  # 20B
+    # "EleutherAI/gpt-neox-20b": [lmppl.LM, 1],  # 20B
+    # "facebook/opt-iml-30b": [lmppl.LM, 1],  # 30B
+    # "facebook/opt-iml-max-30b": [lmppl.LM, 1],  # 30B
+    # "facebook/opt-30b": [lmppl.LM, 1],  # 30B
+    # "google/flan-t5-xxl": [lmppl.EncoderDecoderLM, 1],  # 11B
+    # "t5-11b": [lmppl.EncoderDecoderLM, 1],  # 11B
+    # "t5-3b": [lmppl.EncoderDecoderLM, 4],  # 3B
+    # "EleutherAI/gpt-j-6B": [lmppl.LM, 4],  # 6B
+    # "google/flan-t5-xl": [lmppl.EncoderDecoderLM, 4],  # 3B
+    # "EleutherAI/gpt-neo-2.7B": [lmppl.LM, 8],  # 2.7B
     "gpt2-xl": [lmppl.LM, 8],  # 1.5B
     "EleutherAI/gpt-neo-1.3B": [lmppl.LM, 8],  # 1.3B
     "facebook/opt-iml-max-1.3b": [lmppl.LM, 8],  # 1.3B
@@ -91,6 +91,7 @@ def get_ppl(scoring_model, data, data_name, data_split, batch_size):
     # data_name = 'Quadruples_Green_set'
     # data_split = 'test'
     # dataset setup
+    batch_size = int(batch_size/4)
     encoder_decoder = type(scoring_model) is lmppl.EncoderDecoderLM
     dataset = load_dataset(data, data_name, split=data_split)
     answer = dataset['answer']
