@@ -109,6 +109,10 @@ class LM:
                     model_inputs = self.tokenizer(input_texts[s:e], max_length=self.max_length, truncation=True, padding='max_length', return_tensors='pt')
                 else:
                     model_inputs = self.tokenizer(input_texts[s:e], truncation=True, padding=True, return_tensors='pt')
+
+                if 'token_type_ids' in model_inputs:
+                    model_inputs.pop('token_type_ids')
+
                 output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
 
                 # shift the label sequence for causal inference
