@@ -49,7 +49,7 @@ dataset_list = [  # dataset, dataset_name, split
 ]
 
 language_models = {
-    "facebook/opt-66b": [lmppl.LM, 1],  # 66B
+    # "facebook/opt-66b": [lmppl.LM, 1],  # 66B
     "facebook/galactica-30b": [lmppl.LM, 1],  # 30B
     "facebook/galactica-6.7b": [lmppl.LM, 1],  # 6.7B
     "facebook/galactica-1.3b": [lmppl.LM, 1],  # 1.3B
