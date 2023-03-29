@@ -43,12 +43,18 @@ def template_sentence(sentence: str, separate_in_out: bool):
     return [f"{a} {b}" for a, b in choice]
 
 dataset_list = [  # dataset, dataset_name, split
-    # ['Joanne/Metaphors_and_Analogies', "Quadruples_Green_set", "test"],
+    ['Joanne/Metaphors_and_Analogies', "Quadruples_Green_set", "test"],
     ['Joanne/Metaphors_and_Analogies', 'Pairs_Cardillo_set', "test"],
-    # ['Joanne/Metaphors_and_Analogies', 'Pairs_Jankowiac_set', "test"],
+    ['Joanne/Metaphors_and_Analogies', 'Pairs_Jankowiac_set', "test"],
+    ["Joanne/katz1980_set_A", None, "test"]
 ]
 
 language_models = {
+    # "facebook/opt-66b": [lmppl.LM, 1],  # 66B
+    "facebook/galactica-30b": [lmppl.LM, 1],  # 30B
+    "facebook/galactica-6.7b": [lmppl.LM, 1],  # 6.7B
+    "facebook/galactica-1.3b": [lmppl.LM, 1],  # 1.3B
+    "facebook/galactica-125m": [lmppl.LM, 1],  # 125
     "google/ul2": [lmppl.EncoderDecoderLM, 1],  # 20B
     "google/flan-ul2": [lmppl.EncoderDecoderLM, 1],  # 20B
     "EleutherAI/gpt-neox-20b": [lmppl.LM, 1],  # 20B
@@ -83,7 +89,6 @@ language_models = {
     "roberta-large": [lmppl.MaskedLM, 256],  # 355M
     "roberta-base": [lmppl.MaskedLM, 256],  # 110M
 }
-
 
 
 def get_ppl(scoring_model, data, data_name, data_split, batch_size):
