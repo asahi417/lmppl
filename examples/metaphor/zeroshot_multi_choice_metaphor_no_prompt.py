@@ -120,7 +120,9 @@ if __name__ == '__main__':
             scores_file = f"metaphor_results/scores_no_prompt/{os.path.basename(target_model)}.{os.path.basename(target_data)}_{target_data_name}_{target_split}.json"
             if not os.path.exists(scores_file):
                 if scorer is None:
-                    scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(target_model, device_map='auto', low_cpu_mem_usage=True)
+                    # scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(target_model, device_map='auto', low_cpu_mem_usage=True)
+                    scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(
+                        target_model, low_cpu_mem_usage=True)
                 logging.info(f"[COMPUTING PERPLEXITY] model: `{target_model}`, data: `{target_data}/{target_data_name}/{target_split}`")
                 scores_dict = get_ppl(scorer, target_data, target_data_name, target_split, batch)
                 with open(scores_file, 'w') as f:
