@@ -40,7 +40,7 @@ dataset_list = [  # dataset, dataset_name, split
 ]
 
 language_models = {
-    "t5-small": [lmppl.EncoderDecoderLM, 512],  # 60M
+    "gpt2": [lmppl.LM, 512],  # 124M
     # "facebook/opt-66b": [lmppl.LM, 1],  # 66B
     "facebook/galactica-30b": [lmppl.LM, 1],  # 30B
     "facebook/galactica-6.7b": [lmppl.LM, 1],  # 6.7B
@@ -66,6 +66,7 @@ language_models = {
     "google/flan-t5-large": [lmppl.EncoderDecoderLM, 256],  # 770M
     "google/flan-t5-base": [lmppl.EncoderDecoderLM, 1024],  # 220M
     "google/flan-t5-small": [lmppl.EncoderDecoderLM, 1024],  # 60M
+    "t5-small": [lmppl.EncoderDecoderLM, 512],  # 60M
     "facebook/opt-350m": [lmppl.LM, 128],  # 350M
     "facebook/opt-125m": [lmppl.LM, 256],  # 125M
     "t5-large": [lmppl.EncoderDecoderLM, 128],  # 770M
@@ -73,7 +74,6 @@ language_models = {
     "EleutherAI/gpt-neo-125M": [lmppl.LM, 256],  # 125M
     "gpt2-large": [lmppl.LM, 128],  # 774M
     "gpt2-medium": [lmppl.LM, 256],  # 355M
-    "gpt2": [lmppl.LM, 512],  # 124M
     "bert-large-cased": [lmppl.MaskedLM, 256],  # 355M
     "bert-base-cased": [lmppl.MaskedLM, 256],  # 110M
     "roberta-large": [lmppl.MaskedLM, 256],  # 355M
