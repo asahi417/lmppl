@@ -44,6 +44,7 @@ dataset_list = [  # dataset, dataset_name, split
 ]
 
 language_models = {
+    "gpt2": [lmppl.LM, 512],  # 124M
     # "facebook/opt-66b": [lmppl.LM, 1],  # 66B
     "facebook/galactica-30b": [lmppl.LM, 1],  # 30B
     "facebook/galactica-6.7b": [lmppl.LM, 1],  # 6.7B
@@ -77,7 +78,6 @@ language_models = {
     "EleutherAI/gpt-neo-125M": [lmppl.LM, 256],  # 125M
     "gpt2-large": [lmppl.LM, 128],  # 774M
     "gpt2-medium": [lmppl.LM, 256],  # 355M
-    "gpt2": [lmppl.LM, 512],  # 124M
     "bert-large-cased": [lmppl.MaskedLM, 256],  # 355M
     "bert-base-cased": [lmppl.MaskedLM, 256],  # 110M
     "roberta-large": [lmppl.MaskedLM, 256],  # 355M
