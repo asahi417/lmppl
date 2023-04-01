@@ -16,8 +16,8 @@ label_template = {"metaphor": "is a metaphor.", "literal": "is literal.", "anoma
 def template_four_words(four_words: List, separate_in_out: bool):
     assert len(four_words) == 4, len(four_words)
     if separate_in_out:
-        return [f'"{four_words[0]} is to {four_words[1]}', f'{four_words[2]} is to {four_words[3]}"']
-    return f'"{four_words[0]} is to {four_words[1]} what {four_words[2]} is to {four_words[3]}"'
+        return [f'{four_words[0]} is to {four_words[1]}', f'{four_words[2]} is to {four_words[3]}']
+    return f'{four_words[0]} is to {four_words[1]} what {four_words[2]} is to {four_words[3]}'
 
 
 def template_sentence(sentence: str, separate_in_out: bool):
@@ -122,8 +122,7 @@ if __name__ == '__main__':
             if not os.path.exists(scores_file):
                 if scorer is None:
                     # scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(target_model, device_map='auto', low_cpu_mem_usage=True)
-                    scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(
-                        target_model, low_cpu_mem_usage=True)
+                    scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(target_model)
                 logging.info(f"[COMPUTING PERPLEXITY] model: `{target_model}`, data: `{target_data}/{target_data_name}/{target_split}`")
                 scores_dict = get_ppl(scorer, target_data, target_data_name, target_split, batch)
                 with open(scores_file, 'w') as f:
