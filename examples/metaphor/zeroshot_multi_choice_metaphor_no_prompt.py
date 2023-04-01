@@ -22,12 +22,10 @@ def template_four_words(four_words: List, separate_in_out: bool):
 
 def template_sentence(sentence: str, separate_in_out: bool):
     if separate_in_out:
-        if ' was ' in sentence:
-            a, b = sentence.split(' was ')
-            return [f"{a} was", b]
-        if ' were ' in sentence:
-            a, b = sentence.split(' were ')
-            return [f"{a} were", b]
+        for phrase in [' is ', ' was ', ' were ', ' are ']:
+            if phrase in sentence:
+                a, b = sentence.split(phrase)
+                return [f"{a} {phrase}", b]
         else:
             print("WARNING")
             input(sentence)
