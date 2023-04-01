@@ -104,6 +104,7 @@ def get_ppl(scoring_model, data, data_name, data_split, batch_size):
         ppls = scoring_model.get_perplexity(input_texts=[x[0] for x in dataset_flat], output_texts=[x[1] for x in dataset_flat], batch=batch_size)
         scores["perplexity"] = [{"input": x[0], "output": x[1], "score": float(p), "index": ind} for x, p, ind in zip(dataset_flat, ppls, dataset_index)]
     else:
+        print(dataset_flat[:2])
         ppls = scoring_model.get_perplexity(input_texts=dataset_flat, batch=batch_size)
         scores["perplexity"] = [{"input": x, "output": "", "score": float(p), "index": ind} for x, p, ind in zip(dataset_flat, ppls, dataset_index)]
     return scores
