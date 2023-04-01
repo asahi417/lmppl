@@ -11,6 +11,51 @@ from datasets import load_dataset
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 label_template = {"metaphor": "is a metaphor.", "literal": "is literal.", "anomaly": "is difficult to interpret."}
+dataset_list = [  # dataset, dataset_name, split
+    ['Joanne/Metaphors_and_Analogies', "Quadruples_Green_set", "test"],
+    ['Joanne/Metaphors_and_Analogies', 'Pairs_Cardillo_set', "test"],
+    ['Joanne/Metaphors_and_Analogies', 'Pairs_Jankowiac_set', "test"],
+    # ["Joanne/katz1980_set_A", None, "test"]
+]
+language_models = {
+    "facebook/galactica-30b": [lmppl.LM, 1],  # 30B
+    "facebook/galactica-6.7b": [lmppl.LM, 2],  # 6.7B
+    "facebook/galactica-1.3b": [lmppl.LM, 4],  # 1.3B
+    "facebook/galactica-125m": [lmppl.LM, 512],  # 125
+    "facebook/opt-iml-30b": [lmppl.LM, 1],  # 30B
+    "facebook/opt-iml-max-30b": [lmppl.LM, 1],  # 30B
+    "facebook/opt-iml-max-1.3b": [lmppl.LM, 4],  # 1.3B
+    "facebook/opt-iml-1.3b": [lmppl.LM, 4],  # 1.3B
+    "facebook/opt-30b": [lmppl.LM, 1],  # 30B
+    "facebook/opt-1.3b": [lmppl.LM, 4],  # 1.3B
+    "facebook/opt-350m": [lmppl.LM, 128],  # 350M
+    "facebook/opt-125m": [lmppl.LM, 256],  # 125M
+    "EleutherAI/gpt-neox-20b": [lmppl.LM, 1],  # 20B
+    "EleutherAI/gpt-j-6B": [lmppl.LM, 4],  # 6B
+    "EleutherAI/gpt-neo-2.7B": [lmppl.LM, 8],  # 2.7B
+    "EleutherAI/gpt-neo-1.3B": [lmppl.LM, 8],  # 1.3B
+    "EleutherAI/gpt-neo-125M": [lmppl.LM, 256],  # 125M
+    "gpt2-xl": [lmppl.LM, 8],  # 1.5B
+    "gpt2-large": [lmppl.LM, 128],  # 774M
+    "gpt2-medium": [lmppl.LM, 256],  # 355M
+    "gpt2": [lmppl.LM, 512],  # 124M
+    "bert-large-cased": [lmppl.MaskedLM, 256],  # 355M
+    "bert-base-cased": [lmppl.MaskedLM, 256],  # 110M
+    "roberta-large": [lmppl.MaskedLM, 256],  # 355M
+    "roberta-base": [lmppl.MaskedLM, 256],  # 110M
+    "google/ul2": [lmppl.EncoderDecoderLM, 1],  # 20B
+    "t5-11b": [lmppl.EncoderDecoderLM, 1],  # 11B
+    "t5-3b": [lmppl.EncoderDecoderLM, 4],  # 3B
+    "t5-large": [lmppl.EncoderDecoderLM, 128],  # 770M
+    "t5-base": [lmppl.EncoderDecoderLM, 512],  # 220M
+    "t5-small": [lmppl.EncoderDecoderLM, 512],  # 60M
+    "google/flan-ul2": [lmppl.EncoderDecoderLM, 1],  # 20B
+    "google/flan-t5-xxl": [lmppl.EncoderDecoderLM, 1],  # 11B
+    "google/flan-t5-xl": [lmppl.EncoderDecoderLM, 4],  # 3B
+    "google/flan-t5-large": [lmppl.EncoderDecoderLM, 256],  # 770M
+    "google/flan-t5-base": [lmppl.EncoderDecoderLM, 1024],  # 220M
+    "google/flan-t5-small": [lmppl.EncoderDecoderLM, 1024],  # 60M
+}
 
 
 def template_four_words(four_words: List, separate_in_out: bool):
@@ -26,59 +71,8 @@ def template_sentence(sentence: str, separate_in_out: bool):
             if phrase in sentence:
                 a, b = sentence.split(phrase)
                 return [f"{a} {phrase}", b]
-        else:
-            print("WARNING")
-            input(sentence)
+        raise ValueError(sentence)
     return sentence
-
-
-dataset_list = [  # dataset, dataset_name, split
-    ['Joanne/Metaphors_and_Analogies', "Quadruples_Green_set", "test"],
-    ['Joanne/Metaphors_and_Analogies', 'Pairs_Cardillo_set', "test"],
-    ['Joanne/Metaphors_and_Analogies', 'Pairs_Jankowiac_set', "test"],
-    # ["Joanne/katz1980_set_A", None, "test"]
-]
-
-language_models = {
-    "gpt2": [lmppl.LM, 2],  # 124M
-    # "facebook/opt-66b": [lmppl.LM, 1],  # 66B
-    "facebook/galactica-30b": [lmppl.LM, 1],  # 30B
-    "facebook/galactica-6.7b": [lmppl.LM, 1],  # 6.7B
-    "facebook/galactica-1.3b": [lmppl.LM, 1],  # 1.3B
-    "facebook/galactica-125m": [lmppl.LM, 1],  # 125
-    "google/ul2": [lmppl.EncoderDecoderLM, 1],  # 20B
-    "google/flan-ul2": [lmppl.EncoderDecoderLM, 1],  # 20B
-    "EleutherAI/gpt-neox-20b": [lmppl.LM, 1],  # 20B
-    "facebook/opt-iml-30b": [lmppl.LM, 1],  # 30B
-    "facebook/opt-iml-max-30b": [lmppl.LM, 1],  # 30B
-    "facebook/opt-30b": [lmppl.LM, 1],  # 30B
-    "google/flan-t5-xxl": [lmppl.EncoderDecoderLM, 1],  # 11B
-    "t5-11b": [lmppl.EncoderDecoderLM, 1],  # 11B
-    "t5-3b": [lmppl.EncoderDecoderLM, 4],  # 3B
-    "EleutherAI/gpt-j-6B": [lmppl.LM, 4],  # 6B
-    "google/flan-t5-xl": [lmppl.EncoderDecoderLM, 4],  # 3B
-    "EleutherAI/gpt-neo-2.7B": [lmppl.LM, 8],  # 2.7B
-    "gpt2-xl": [lmppl.LM, 8],  # 1.5B
-    "EleutherAI/gpt-neo-1.3B": [lmppl.LM, 8],  # 1.3B
-    "facebook/opt-iml-max-1.3b": [lmppl.LM, 8],  # 1.3B
-    "facebook/opt-iml-1.3b": [lmppl.LM, 8],  # 1.3B
-    "facebook/opt-1.3b": [lmppl.LM, 8],  # 1.3B
-    "google/flan-t5-large": [lmppl.EncoderDecoderLM, 256],  # 770M
-    "google/flan-t5-base": [lmppl.EncoderDecoderLM, 1024],  # 220M
-    "google/flan-t5-small": [lmppl.EncoderDecoderLM, 1024],  # 60M
-    "t5-small": [lmppl.EncoderDecoderLM, 512],  # 60M
-    "facebook/opt-350m": [lmppl.LM, 128],  # 350M
-    "facebook/opt-125m": [lmppl.LM, 256],  # 125M
-    "t5-large": [lmppl.EncoderDecoderLM, 128],  # 770M
-    "t5-base": [lmppl.EncoderDecoderLM, 512],  # 220M
-    "EleutherAI/gpt-neo-125M": [lmppl.LM, 256],  # 125M
-    "gpt2-large": [lmppl.LM, 128],  # 774M
-    "gpt2-medium": [lmppl.LM, 256],  # 355M
-    "bert-large-cased": [lmppl.MaskedLM, 256],  # 355M
-    "bert-base-cased": [lmppl.MaskedLM, 256],  # 110M
-    "roberta-large": [lmppl.MaskedLM, 256],  # 355M
-    "roberta-base": [lmppl.MaskedLM, 256],  # 110M
-}
 
 
 def get_ppl(scoring_model, data, data_name, data_split, batch_size):
@@ -120,8 +114,7 @@ if __name__ == '__main__':
             scores_file = f"metaphor_results/scores_no_prompt/{os.path.basename(target_model)}.{os.path.basename(target_data)}_{target_data_name}_{target_split}.json"
             if not os.path.exists(scores_file):
                 if scorer is None:
-                    # scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(target_model, device_map='auto', low_cpu_mem_usage=True)
-                    scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(target_model)
+                    scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(target_model, device_map='auto', low_cpu_mem_usage=True)
                 logging.info(f"[COMPUTING PERPLEXITY] model: `{target_model}`, data: `{target_data}/{target_data_name}/{target_split}`")
                 scores_dict = get_ppl(scorer, target_data, target_data_name, target_split, batch)
                 with open(scores_file, 'w') as f:
