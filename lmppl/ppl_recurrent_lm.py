@@ -114,6 +114,7 @@ class LM:
                     model_inputs.pop('token_type_ids')
 
                 print(model_inputs)
+                print(self.device)
                 output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
 
                 # shift the label sequence for causal inference
