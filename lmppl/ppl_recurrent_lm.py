@@ -62,6 +62,10 @@ class LM:
 
         if self.tokenizer.pad_token is None:
             self.tokenizer.add_special_tokens({'pad_token': "<<PAD>>"})
+        print(self.tokenizer.pad_token_id)
+        print(self.tokenizer.pad_token)
+        print(self.tokenizer.vocab_size)
+        input()
         if max_length is None:
             self.max_length = None
         else:
