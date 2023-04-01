@@ -60,9 +60,9 @@ class LM:
             params['device_map'] = device_map
         self.model = transformers.AutoModelForCausalLM.from_pretrained(model, **params)
 
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.add_special_tokens({'pad_token': "<<PAD>>"})
-            self.model.resize_token_embeddings(self.tokenizer.vocab_size)
+        # if self.tokenizer.pad_token is None:
+        #     self.tokenizer.add_special_tokens({'pad_token': "<<PAD>>"})
+        #     self.model.resize_token_embeddings(self.tokenizer.vocab_size)
 
         if max_length is None:
             self.max_length = None
