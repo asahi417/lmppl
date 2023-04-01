@@ -104,7 +104,8 @@ def get_ppl(scoring_model, data, data_name, data_split, batch_size):
         ppls = scoring_model.get_perplexity(input_texts=[x[0] for x in dataset_flat], output_texts=[x[1] for x in dataset_flat], batch=batch_size)
         scores["perplexity"] = [{"input": x[0], "output": x[1], "score": float(p), "index": ind} for x, p, ind in zip(dataset_flat, ppls, dataset_index)]
     else:
-        print(dataset_flat[:2])
+        print(dataset_flat[:2], len(dataset_flat))
+        ppls = scoring_model.get_perplexity(input_texts=dataset_flat[:10], batch=batch_size)
         ppls = scoring_model.get_perplexity(input_texts=dataset_flat, batch=batch_size)
         scores["perplexity"] = [{"input": x, "output": "", "score": float(p), "index": ind} for x, p, ind in zip(dataset_flat, ppls, dataset_index)]
     return scores
@@ -122,7 +123,7 @@ if __name__ == '__main__':
             if not os.path.exists(scores_file):
                 if scorer is None:
                     # scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(target_model, device_map='auto', low_cpu_mem_usage=True)
-                    scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(target_model, max_length=256)
+                    scorer = lm_class(target_model, max_length=256) if lm_class is lmppl.MaskedLM else lm_class(target_model)
                 logging.info(f"[COMPUTING PERPLEXITY] model: `{target_model}`, data: `{target_data}/{target_data_name}/{target_split}`")
                 scores_dict = get_ppl(scorer, target_data, target_data_name, target_split, batch)
                 with open(scores_file, 'w') as f:

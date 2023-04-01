@@ -29,7 +29,7 @@ class LM:
     """ Language Model. """
 
     def __init__(self,
-                 model: str = 'distilgpt2',
+                 model: str = 'gpt2',
                  use_auth_token: bool = False,
                  max_length: int = None,
                  num_gpus: int = None,
