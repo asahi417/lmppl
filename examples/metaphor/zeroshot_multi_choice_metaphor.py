@@ -19,15 +19,15 @@ dataset_list = [  # dataset, dataset_name, split
 ]
 language_models = {
     "facebook/galactica-30b": [lmppl.LM, 1],  # 30B
-    "facebook/galactica-6.7b": [lmppl.LM, 1],  # 6.7B
-    "facebook/galactica-1.3b": [lmppl.LM, 1],  # 1.3B
-    "facebook/galactica-125m": [lmppl.LM, 1],  # 125
+    "facebook/galactica-6.7b": [lmppl.LM, 2],  # 6.7B
+    "facebook/galactica-1.3b": [lmppl.LM, 4],  # 1.3B
+    "facebook/galactica-125m": [lmppl.LM, 512],  # 125
     "facebook/opt-iml-30b": [lmppl.LM, 1],  # 30B
     "facebook/opt-iml-max-30b": [lmppl.LM, 1],  # 30B
-    "facebook/opt-iml-max-1.3b": [lmppl.LM, 8],  # 1.3B
-    "facebook/opt-iml-1.3b": [lmppl.LM, 8],  # 1.3B
+    "facebook/opt-iml-max-1.3b": [lmppl.LM, 4],  # 1.3B
+    "facebook/opt-iml-1.3b": [lmppl.LM, 4],  # 1.3B
     "facebook/opt-30b": [lmppl.LM, 1],  # 30B
-    "facebook/opt-1.3b": [lmppl.LM, 8],  # 1.3B
+    "facebook/opt-1.3b": [lmppl.LM, 4],  # 1.3B
     "facebook/opt-350m": [lmppl.LM, 128],  # 350M
     "facebook/opt-125m": [lmppl.LM, 256],  # 125M
     "EleutherAI/gpt-neox-20b": [lmppl.LM, 1],  # 20B
