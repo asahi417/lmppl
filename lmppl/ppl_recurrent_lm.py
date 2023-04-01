@@ -61,10 +61,8 @@ class LM:
         self.model = transformers.AutoModelForCausalLM.from_pretrained(model, **params)
 
         if self.tokenizer.pad_token is None:
-            # self.tokenizer.add_special_tokens({'additional_special_tokens': list(ADDITIONAL_SP_TOKENS.values())})
             self.tokenizer.add_special_tokens({'pad_token': "<<PAD>>"})
             self.model.resize_token_embeddings(len(self.tokenizer))
-        #     self.model.resize_token_embeddings(self.tokenizer.vocab_size)
 
         if max_length is None:
             self.max_length = None
@@ -117,8 +115,6 @@ class LM:
                 if 'token_type_ids' in model_inputs:
                     model_inputs.pop('token_type_ids')
 
-                print(model_inputs)
-                print(self.device)
                 output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
 
                 # shift the label sequence for causal inference
