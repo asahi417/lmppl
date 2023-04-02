@@ -10,6 +10,7 @@
 
 import os
 import logging
+import gc
 from math import exp
 from typing import List
 from tqdm import tqdm
