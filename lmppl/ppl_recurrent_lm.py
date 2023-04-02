@@ -23,6 +23,7 @@ from .util import internet_connection
 os.environ["OMP_NUM_THREADS"] = "1"  # to turn off warning message
 os.environ["TOKENIZERS_PARALLELISM"] = "false"  # to turn off warning message
 PAD_TOKEN_LABEL_ID = torch.nn.CrossEntropyLoss().ignore_index
+FORCE_RESET = bool(int(os.getenv("FORCE_RESET", "0")))
 
 
 class LM:
@@ -128,6 +129,14 @@ class LM:
                 loss = loss.view(len(output['logits']), -1)
                 loss = torch.sum(loss, -1) / valid_length
                 loss_list += loss.cpu().tolist()
+
+                if FORCE_RESET:
+                    del model_inputs
+                    del loss
+                    del output
+                    gc.collect()
+                    torch.cuda.empty_cache()
+
 
         # conversion to perplexity
         ppl = [exp(i) for i in loss_list]
