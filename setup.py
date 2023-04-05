@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 with open('README.md', 'r') as f:
     readme = f.read()
-VERSION = '0.2.2'
+VERSION = '0.2.3'
 NAME = 'lmppl'
 LICENSE = 'MIT License'
 setup(
@@ -35,6 +35,7 @@ setup(
         "transformers",
         "sentencepiece",
         "accelerate",
+        "openai",
         "protobuf<3.20"  # required by DeBERTa models
     ],
     python_requires='>=3.6',
