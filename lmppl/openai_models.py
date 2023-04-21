@@ -49,7 +49,7 @@ class OpenAI:
                         prompt=text,
                         logprobs=0, # Include the log probabilities on the logprobs most likely tokens, as well the chosen tokens. https://platform.openai.com/docs/api-reference/completions/create#completions/create-logprobs
                         max_tokens=0,
-                        temperature=0.0,
+                        temperature=1.0,
                         echo=True  # Echo back the prompt in addition to the completion https://platform.openai.com/docs/api-reference/completions/create#completions/create-echo
                     )
                     break
