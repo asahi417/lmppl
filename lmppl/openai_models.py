@@ -31,7 +31,7 @@ class OpenAI:
         self.model = model
         self.sleep_time = sleep_time
 
-    def get_perplexity(self, input_texts: str or List):
+    def get_perplexity(self, input_texts: str or List, *args, **kwargs):
         """ Compute the perplexity on recurrent LM.
 
         :param input_texts: A string or list of input texts for the encoder.
@@ -61,5 +61,5 @@ class OpenAI:
                     logging.info(f'Rate limit exceeded. Waiting for {self.sleep_time} seconds.')
                     sleep(self.sleep_time)
             nll.append(sum([i for i in completion['choices'][0]['logprobs']['token_logprobs'] if i is not None]))
-        ppl = [exp(i) for i in nll]
+        ppl = [exp(-i) for i in nll]
         return ppl[0] if single_input else ppl

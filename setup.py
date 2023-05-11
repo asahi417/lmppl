@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 with open('README.md', 'r') as f:
     readme = f.read()
-VERSION = '0.2.4'
+VERSION = '0.2.6'
 NAME = 'lmppl'
 LICENSE = 'MIT License'
 setup(
