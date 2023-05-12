@@ -12,7 +12,7 @@ import logging
 from math import exp
 from typing import List
 from tqdm import tqdm
-
+from statistics import mean
 from time import sleep
 import openai
 
@@ -60,6 +60,6 @@ class OpenAI:
                         exit()
                     logging.info(f'Rate limit exceeded. Waiting for {self.sleep_time} seconds.')
                     sleep(self.sleep_time)
-            nll.append(sum([i for i in completion['choices'][0]['logprobs']['token_logprobs'] if i is not None]))
+            nll.append(mean([i for i in completion['choices'][0]['logprobs']['token_logprobs'] if i is not None]))
         ppl = [exp(-i) for i in nll]
         return ppl[0] if single_input else ppl
