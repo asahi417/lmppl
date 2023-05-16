@@ -38,6 +38,8 @@ class LM:
                  torch_dtype=None,
                  device_map: str = None,
                  low_cpu_mem_usage: bool = False,
+                 trust_remote_code: bool = True,
+                 offload_folder: str = None,
                  hf_cache_dir: str = None):
         """ Language Model.
 
@@ -49,9 +51,12 @@ class LM:
         logging.info(f'Loading Model: `{model}`')
 
         # load model
-        params = {"local_files_only": not internet_connection(), "use_auth_token": use_auth_token}
+        params = {"local_files_only": not internet_connection(), "use_auth_token": use_auth_token,
+                  "trust_remote_code": trust_remote_code}
         if hf_cache_dir is not None:
             params["cache_dir"] = hf_cache_dir
+        if offload_folder is not None:
+            params["offload_folder"] = offload_folder
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(model, **params)
         self.config = transformers.AutoConfig.from_pretrained(model, **params)
 

@@ -30,12 +30,17 @@ def get_lm(model_name: str,
            torch_dtype=None,
            device_map: str = None,
            low_cpu_mem_usage: bool = False,
+           trust_remote_code: bool = True,
+           offload_folder: str = None,
            hf_cache_dir: str = None):
     """ get encoder-decoder lms from huggingface """
     # tokenizer
-    params = {"local_files_only": not internet_connection(), "use_auth_token": use_auth_token}
+    params = {"local_files_only": not internet_connection(), "use_auth_token": use_auth_token,
+              "trust_remote_code": trust_remote_code}
     if hf_cache_dir is not None:
         params["cache_dir"] = hf_cache_dir
+    if offload_folder is not None:
+        params["offload_folder"] = offload_folder
     tokenizer = transformers.AutoTokenizer.from_pretrained(model_name, **params)
 
     # config
@@ -77,6 +82,8 @@ class EncoderDecoderLM:
                  torch_dtype=None,
                  device_map: str = None,
                  low_cpu_mem_usage: bool = False,
+                 trust_remote_code: bool = True,
+                 offload_folder: str = None,
                  hf_cache_dir: str = None):
         """ Encoder-Decoder Language Model.
 
@@ -91,7 +98,8 @@ class EncoderDecoderLM:
         self.device_map = device_map
         self.tokenizer, self.model, self.config = get_lm(
             model, use_auth_token=use_auth_token, torch_dtype=torch_dtype, device_map=self.device_map,
-            low_cpu_mem_usage=low_cpu_mem_usage, hf_cache_dir=hf_cache_dir)
+            low_cpu_mem_usage=low_cpu_mem_usage, hf_cache_dir=hf_cache_dir, trust_remote_code=trust_remote_code,
+            offload_folder=offload_folder)
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = "<<PAD>>"
         if max_length_encoder is None:
