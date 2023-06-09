@@ -100,8 +100,13 @@ class EncoderDecoderLM:
             model, use_auth_token=use_auth_token, torch_dtype=torch_dtype, device_map=self.device_map,
             low_cpu_mem_usage=low_cpu_mem_usage, hf_cache_dir=hf_cache_dir, trust_remote_code=trust_remote_code,
             offload_folder=offload_folder)
+
+        self.pad_token_initialized = False
         if self.tokenizer.pad_token is None:
-            self.tokenizer.pad_token = "<<PAD>>"
+            self.tokenizer.add_special_tokens({'pad_token': "<<PAD>>"})
+            self.model.resize_token_embeddings(len(self.tokenizer))
+            self.pad_token_initialized = True
+
         if max_length_encoder is None:
             self.max_length_encoder = None
         else:
@@ -178,9 +183,12 @@ class EncoderDecoderLM:
                     model_inputs["labels"] = label.to(self.device)
 
                 # model run & loss conversion into likelihood
+                logits = output['logits']
+                if self.pad_token_initialized:
+                    logits = logits[:, :, :-1]
                 valid_length = (model_inputs["labels"] != PAD_TOKEN_LABEL_ID).sum(dim=-1)
-                loss = self.loss_fct(output['logits'].view(-1, self.config.vocab_size), model_inputs["labels"].view(-1))
-                loss = loss.view(len(output['logits']), -1)
+                loss = self.loss_fct(logits.view(-1, self.config.vocab_size), model_inputs["labels"].view(-1))
+                loss = loss.view(len(logits), -1)
                 loss = torch.sum(loss, -1) / valid_length
                 loss_list += loss.cpu().tolist()
 
@@ -194,3 +202,12 @@ class EncoderDecoderLM:
         # conversion to perplexity
         ppl = [exp(i) for i in loss_list]
         return ppl[0] if single_input else ppl
+
+
+if __name__ == '__main__':
+
+    # scorer = LM("gpt2")
+    scorer = EncoderDecoderLM("t5-small")
+    _x = 'sentiment classification: I dropped my laptop on my knee, and someone stole my coffee.'
+    print(scorer.get_perplexity(input_texts=[_x] * 2, output_texts=['I am happy.', 'I am sad.']))
+

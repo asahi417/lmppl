@@ -67,9 +67,11 @@ class LM:
             params['device_map'] = device_map
         self.model = transformers.AutoModelForCausalLM.from_pretrained(model, **params)
 
+        self.pad_token_initialized = False
         if self.tokenizer.pad_token is None:
             self.tokenizer.add_special_tokens({'pad_token': "<<PAD>>"})
             self.model.resize_token_embeddings(len(self.tokenizer))
+            self.pad_token_initialized = True
 
         if max_length is None:
             self.max_length = None
@@ -118,20 +120,25 @@ class LM:
                     model_inputs = self.tokenizer(input_texts[s:e], max_length=self.max_length, truncation=True, padding='max_length', return_tensors='pt')
                 else:
                     model_inputs = self.tokenizer(input_texts[s:e], truncation=True, padding=True, return_tensors='pt')
-
                 if 'token_type_ids' in model_inputs:
                     model_inputs.pop('token_type_ids')
 
                 output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
+                logit = output['logits']
+                if self.pad_token_initialized:
+                    logit = logit[:, :, :-1]
 
                 # shift the label sequence for causal inference
                 label = model_inputs['input_ids']
                 label[label == self.tokenizer.pad_token_id] = PAD_TOKEN_LABEL_ID
-                label = torch.concat([label[:, 1:], torch.tensor([[PAD_TOKEN_LABEL_ID] * label.shape[0]]).T], dim=1).to(self.device)
+
+                # Shift so that tokens < n predict n
+                shift_logits = logit[..., :-1, :].contiguous()
+                shift_label = label[:, 1:].contiguous()
 
                 # compute loss
-                valid_length = (label != PAD_TOKEN_LABEL_ID).sum(dim=-1)
-                loss = self.loss_fct(output['logits'].view(-1, self.config.vocab_size), label.view(-1))
+                valid_length = (shift_label != PAD_TOKEN_LABEL_ID).sum(dim=-1)
+                loss = self.loss_fct(shift_logits.view(-1, shift_logits.size(-1)), shift_label.view(-1))
                 loss = loss.view(len(output['logits']), -1)
                 loss = torch.sum(loss, -1) / valid_length
                 loss_list += loss.cpu().tolist()
@@ -143,7 +150,17 @@ class LM:
                     gc.collect()
                     torch.cuda.empty_cache()
 
-
         # conversion to perplexity
         ppl = [exp(i) for i in loss_list]
         return ppl[0] if single_input else ppl
+
+
+if __name__ == '__main__':
+
+    # scorer = LM("gpt2")
+    scorer = LM("facebook/opt-125m")
+    text = [
+        'sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am happy.',
+        'sentiment classification: I dropped my laptop on my knee, and someone stole my coffee. I am sad.'
+    ]
+    print(scorer.get_perplexity(text))
