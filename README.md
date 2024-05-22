@@ -85,6 +85,20 @@ print(f"prediction: {outputs[ppl.index(min(ppl))]}")
 >>> "prediction: I am sad."
 ```
 
+### Models
+Below are some examples of popular models and the corresponding model type to use within the lmppl package.
+
+| Model     | HuggingFace ID                   | Model Type       |
+|-----------|----------------------------------|------------------|
+| BERT      | google-bert/bert-base-uncased    | MaskedLM         |
+| Roberta   | roberta-large                    | MaskedLM         |
+| GPT 2     | gpt2-xl                          | LM               |
+| flan-ul2  | google/flan-ul2                  | EncoderDecoderLM |
+| GPT-NeoX  | EleutherAI/gpt-neox-20b          | LM               |
+| OPT       | facebook/opt-30b                 | LM               |
+| Mixtral   | mistralai/Mixtral-8x22B-v0.1     | LM               |
+| Llama 3   | meta-llama/Meta-Llama-3-8B       | LM               |
+
 ### Tips
 - **Max Token Length**: Each LM has its own max-token length (`max_length` for recurrent/masked LMs, and `max_length_encoder` and `max_length_decoder` for encoder-decoder LMs).
 Limiting those max-token will reduce the time to process the text, but it may affect the accuracy of the perplexity, so please experiment on your texts and decide
