@@ -96,19 +96,19 @@ class LM:
         self.model.eval()
         logging.info(f'\t * model is loaded on: {self.device}')
 
-    def get_perplexity(self, input_texts: str or List, batch: int = None):
+    def get_perplexity(self, input_texts: str or List, batch_size: int = None):
         """ Compute the perplexity on recurrent LM.
 
         :param input_texts: A string or list of input texts for the encoder.
-        :param batch: Batch size
+        :param batch_size: Batch size
         :return: A value or list of perplexity.
         """
 
         # batch preparation
         single_input = type(input_texts) == str
         input_texts = [input_texts] if single_input else input_texts
-        batch = len(input_texts) if batch is None else batch
-        batch_id = list(range(0, len(input_texts), batch)) + [len(input_texts)]
+        batch_size = len(input_texts) if batch_size is None else batch_size
+        batch_id = list(range(0, len(input_texts), batch_size)) + [len(input_texts)]
         batch_id = list(zip(batch_id[:-1], batch_id[1:]))
 
         loss_list = []
