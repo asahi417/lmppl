@@ -92,11 +92,11 @@ class MaskedLM:
         self.model.eval()
         logging.info(f'\t * model is loaded on: {self.device}')
 
-    def get_perplexity(self, input_texts: str or List, batch: int = None):
+    def get_perplexity(self, input_texts: str or List, batch_size: int = None):
         """ Compute the perplexity on MLM.
 
         :param input_texts: A string or list of input texts for the encoder.
-        :param batch: Batch size
+        :param batch_size: Batch size
         :return: A value or list of perplexity.
         """
 
@@ -142,8 +142,8 @@ class MaskedLM:
         data = list(chain(*data))
 
         # batch preparation
-        batch = len(data) if batch is None else batch
-        batch_id = list(range(0, len(data), batch)) + [len(data)]
+        batch_size = len(data) if batch_size is None else batch_size
+        batch_id = list(range(0, len(data), batch_size)) + [len(data)]
         batch_id = list(zip(batch_id[:-1], batch_id[1:]))
 
         # run model

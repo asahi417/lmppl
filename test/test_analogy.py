@@ -21,7 +21,7 @@ flatten_index = list(chain(*[[n] * len(x) for n, x in enumerate(choices)]))
 
 # get perplexity
 model = LM('gpt2-xl')
-scores = model.get_perplexity(flatten_choice, batch=32)
+scores = model.get_perplexity(flatten_choice, batch_size=32)
 
 # reconstruct the data structure and compute accuracy
 index_score = list(zip(flatten_index, scores))

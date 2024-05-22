@@ -135,12 +135,12 @@ class EncoderDecoderLM:
         self.model.eval()
         logging.info(f'\t * model is loaded on: {self.device}')
 
-    def get_perplexity(self, input_texts: str or List, output_texts: str or List, batch: int = None):
+    def get_perplexity(self, input_texts: str or List, output_texts: str or List, batch_size: int = None):
         """ Compute the perplexity on decoder of the seq2seq model.
 
         :param input_texts: A string or list of input texts for the encoder.
         :param output_texts: A string or list of output texts for the decoder.
-        :param batch: Batch size
+        :param batch_size: Batch size
         :return: A value or list of perplexity.
         """
         assert type(input_texts) is type(output_texts), f"{type(input_texts)} != {type(output_texts)}"
@@ -150,8 +150,8 @@ class EncoderDecoderLM:
         input_texts = [input_texts] if single_input else input_texts
         output_texts = [output_texts] if single_input else output_texts
         assert len(input_texts) == len(output_texts), f"{len(input_texts)} == {len(output_texts)}"
-        batch = len(output_texts) if batch is None else batch
-        batch_id = list(range(0, len(input_texts), batch)) + [len(output_texts)]
+        batch_size = len(output_texts) if batch_size is None else batch_size
+        batch_id = list(range(0, len(input_texts), batch_size)) + [len(output_texts)]
         batch_id = list(zip(batch_id[:-1], batch_id[1:]))
 
         loss_list = []
