@@ -40,6 +40,7 @@ class LM:
                  low_cpu_mem_usage: bool = False,
                  trust_remote_code: bool = True,
                  offload_folder: str = None,
+                 attn_implementation: str = None,
                  hf_cache_dir: str = None):
         """ Language Model.
 
@@ -65,6 +66,8 @@ class LM:
             params['torch_dtype'] = torch_dtype
         if device_map is not None:
             params['device_map'] = device_map
+        if attn_implementation is not None:
+            params['attn_implementation'] = attn_implementation
         self.model = transformers.AutoModelForCausalLM.from_pretrained(model, **params)
 
         self.pad_token_initialized = False

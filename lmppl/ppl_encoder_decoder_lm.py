@@ -32,6 +32,7 @@ def get_lm(model_name: str,
            low_cpu_mem_usage: bool = False,
            trust_remote_code: bool = True,
            offload_folder: str = None,
+           attn_implementation: str = None,
            hf_cache_dir: str = None):
     """ get encoder-decoder lms from huggingface """
     # tokenizer
@@ -64,6 +65,8 @@ def get_lm(model_name: str,
         params['torch_dtype'] = torch_dtype
     if device_map is not None:
         params['device_map'] = device_map
+    if attn_implementation is not None:
+        params['attn_implementation'] = attn_implementation
     model = model_class(model_name, **params)
     if model.config.decoder_start_token_id is None:
         model.config.decoder_start_token_id = tokenizer.pad_token_id
@@ -84,6 +87,7 @@ class EncoderDecoderLM:
                  low_cpu_mem_usage: bool = False,
                  trust_remote_code: bool = True,
                  offload_folder: str = None,
+                 attn_implementation: str = None,
                  hf_cache_dir: str = None):
         """ Encoder-Decoder Language Model.
 
@@ -99,7 +103,8 @@ class EncoderDecoderLM:
         self.tokenizer, self.model, self.config = get_lm(
             model, use_auth_token=use_auth_token, torch_dtype=torch_dtype, device_map=self.device_map,
             low_cpu_mem_usage=low_cpu_mem_usage, hf_cache_dir=hf_cache_dir, trust_remote_code=trust_remote_code,
-            offload_folder=offload_folder)
+            offload_folder=offload_folder, attn_implementation=attn_implementation
+        )
 
         self.pad_token_initialized = False
         if self.tokenizer.pad_token is None:

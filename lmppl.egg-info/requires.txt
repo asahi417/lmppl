@@ -1,0 +1,8 @@
+torch
+tqdm
+requests
+transformers
+sentencepiece
+accelerate
+openai
+protobuf<3.20

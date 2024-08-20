@@ -37,6 +37,7 @@ class MaskedLM:
                  low_cpu_mem_usage: bool = False,
                  trust_remote_code: bool = True,
                  offload_folder: str = None,
+                 attn_implementation: str = None,
                  hf_cache_dir: str = None):
         """ Masked Language Model.
 
@@ -61,6 +62,8 @@ class MaskedLM:
             params['torch_dtype'] = torch_dtype
         if device_map is not None:
             params['device_map'] = device_map
+        if attn_implementation is not None:
+            params['attn_implementation'] = attn_implementation
         self.model = transformers.AutoModelForMaskedLM.from_pretrained(model, **params)
         if max_length is None:
             self.max_length = None
