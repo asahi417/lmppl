@@ -133,7 +133,7 @@ class LM:
                     logit = logit[:, :, :-1]
 
                 # shift the label sequence for causal inference
-                label = model_inputs['input_ids']
+                label = model_inputs['input_ids'].to(self.device)
                 label[label == self.tokenizer.pad_token_id] = PAD_TOKEN_LABEL_ID
 
                 # Shift so that tokens < n predict n
