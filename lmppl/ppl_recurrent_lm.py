@@ -125,8 +125,8 @@ class LM:
                     model_inputs = self.tokenizer(input_texts[s:e], truncation=True, padding=True, return_tensors='pt')
                 if 'token_type_ids' in model_inputs:
                     model_inputs.pop('token_type_ids')
-		
-		model_inputs = {k: v.to(self.device) for k, v in model_inputs.items()}
+
+                model_inputs = {k: v.to(self.device) for k, v in model_inputs.items()}
                 output = self.model(**{k: v.to(self.device) for k, v in model_inputs.items()})
                 logit = output['logits']
                 if self.pad_token_initialized:
